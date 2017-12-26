@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=640,user-scalable=0,target-densitydpi=device-dpi">
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #Mycanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        #mvideo {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 480px;
+            height: 360px;
+            margin: -180px 0 0 -240px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="Mycanvas">
+
+        </canvas>
+    <video loop controls autoplay id="mvideo">
+            <source src="test.mp4" type="video/mp4"></source>
+        </video>
+</body>
+<script>
+    !(function(doc) {
+
+        var Mycanvas = doc.getElementById("Mycanvas"),
+            cont = Mycanvas.getContext("2d"),
+            Myvideo = doc.getElementById("mvideo");
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        Mycanvas.width = cw;
+        Mycanvas.height = ch;
+        Myvideo.addEventListener("canplay", function() {
+            var cont2 = cerateCanvas(cw, ch).getContext("2d");
+            draw(this, cont, cont2, cw, ch);
+        }, false)
+
+        function cerateCanvas(w, h) {
+            var cr = doc.createElement("canvas");
+            cr.width = w;
+            cr.height = h;
+            return cr;
+        }
+
+        function draw(v, c, c2, w, h) {
+            if (v.paused || v.ended) {
+                cancelAnimationFrame(stop);
+                return false;
+            }
+            c2.drawImage(v, 0, 0, w, h);
+            var idata = c2.getImageData(0, 0, w, h),
+                data = idata.data;
+            // for (var i = 0; i < data.length; i += 4) {
+            //     var r = data[i],
+            //         g = data[i + 1],
+            //         b = data[i + 2];
+            //     brightness = (3 * r + 4 * g + b) >>> 3;
+            //     data[i] = brightness;
+            //     data[i + 1] = brightness;
+            //     data[i + 2] = brightness;
+            // };
+            idata.data = data;
+            c.putImageData(idata, 0, 0);
+            var stop = requestAnimationFrame(function() {
+                draw(v, c, c2, w, h);
+            });
+        }
+    })(document)
+</script>
+
+</html>
