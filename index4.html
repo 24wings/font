@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=640,minimum-scale=0,maximum-scale=5,user-scalable=no" name="viewport" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+    <title>微信video标签全屏无法退出bug</title>
+    <!-- 调试用 -->
+    <script type="text/javascript" src="http://10.12.8.161:8081/client/#anonymous"></script>
+</head>
+
+<body>
+    安卓(android)微信里面video播放视频，会被强制全屏，播放完毕后还有腾讯推荐的广告视频，非常讨厌。。 强制被全屏无法解决，但是视频播放完毕后退出播放器可以解决。 方法就是视频播放完毕后，用音频audio标签播放一个短音频
+    <div id="vv"><video width="640" height="320" class="video1" id='video1' x-webkit-airplay="true" webkit-playsinline="true" preload="auto" src="http://www.w3school.com.cn/example/html5/mov_bbb.mp4"></video>
+        <div id="second"></div>
+    </div>
+
+    <audio preload="auto" src="http://static.beetobees.com/music-wx/msg.mp3" id="msgr"></audio>
+    <!-- <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script> -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        var video1 = document.getElementById("video1");
+        video1.play();
+        setTimeout(function() {
+            video1.pause();
+        }, 800);
+
+        $("body").click(function() {
+            $(video1).parent().show();
+            video1.src = video1.src;
+            video1.play();
+        });
+
+        var aud = document.getElementById("msgr");
+        video1.addEventListener('ended', function() {
+            aud.play();
+            setTimeout(function() {
+                var video = $('#vv');
+                //video.addClass('close');
+                setTimeout(function() {
+                    //video.hide();
+                }, 500);
+            }, 1000);
+        }, false);
+    </script>
+</body>
+
+</html>

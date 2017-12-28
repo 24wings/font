@@ -10,12 +10,18 @@
     <link rel="stylesheet" type="text/css" href="./css/mobilReset.css" />
     <link rel="stylesheet" type="text/css" href="./font/iconfont.css" />
     <link rel="stylesheet" href="/style.css">
+    <!-- <meta name="full-screen" content="yes"> -->
+    <!-- <meta name="browsermode" content="application"> -->
+
     <title>司马彦书法学院</title>
+
+
 
 </head>
 
 <body>
     <div class="content">
+
         <div class="content-box">
             <div class="search">
                 <input type="text" placeholder="请输入汉字">
@@ -28,8 +34,10 @@
                 <i class="iconfont">&#xe641;</i>
             </div>
         </div>
-
-        <canvas id="video"></canvas>
+        <div id="video">
+            <video src="test.mp4" controls="" x5-playsinline="" playsinline="" webkit-playsinline="" poster="" preload="auto"> </video>
+            <!-- <embed style="width:100vh;height:100vh" src="http://imgcache.qq.com/tencentvideo_v1/player/TPout.swf?max_age=86400&v=20140714" type=""> -->
+        </div>
 
         <div class="footer">
 
@@ -65,269 +73,8 @@
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="video.js"></script>
 
-    <script>
-        try {
-            //  <video src="test.mp4" id="mvideo" style="display:none;opacity:0;z-index:-9999999999" controls="controls" preload="preload" ontouch="stopFullScreen()"></video>
-            var Mycanvas = document.getElementById("video"),
-                cont = Mycanvas.getContext("2d");
-            var videoEl = document.createElement('video');
-            videoEl.src = "test.mp4";
-            cw = window.innerWidth;
-            ch = window.innerHeight;
-            Mycanvas.width = cw;
-            Mycanvas.height = ch;
-            var MyCanvas2 = document.createElement("canvas");
-            MyCanvas2.width = cw;
-            MyCanvas2.height = ch;
-            var cont2 = MyCanvas2.getContext("2d");
-            // document.body.appendChild(videoEl)
-            // videoEl.onloadeddata
-            setTimeout(() => {
-                // alert('canplay')
-                videoEl.play();
-                cont2.width = this.width;
-                cont2.height = this.height;
-                draw(this, cont, cont2, cw, ch);
-                // alert('canplay2')
-
-            }, 5000);
-            // videoEl.addEventListener("canplay", function() {
-            //     alert('canplay')
-            // videoEl.play();
-            //     cont2.width = this.width;
-            //     cont2.height = this.height;
-            //     draw(this, cont, cont2, cw, ch);
-
-            // }, false);
-
-            function stopFullScreen(e) {
-                // e.preventDefault();
-                exitFull();
-                setTimeout(() => {
-                    exitFull()
-
-                    document.cancelFullScreen();
-
-                }, 1000)
-                return false;
-                // document.getElementById('video').ex
-            }
-
-            function exitFull() {
-                // 判断各种浏览器，找到正确的方法
-                var exitMethod = document.exitFullscreen || //W3C
-                    document.mozCancelFullScreen || //Chrome等
-                    document.webkitExitFullscreen || //FireFox
-                    document.webkitExitFullscreen; //IE11
-                if (exitMethod) {
-                    exitMethod.call(document);
-                } else if (typeof window.ActiveXObject !== "undefined") { //for Internet Explorer
-                    var wscript = new ActiveXObject("WScript.Shell");
-                    if (wscript !== null) {
-                        wscript.SendKeys("{F11}");
-                    }
-                }
-            }
-
-            function requestFullScreen(element) {
-                // 判断各种浏览器，找到正确的方法
-                var requestMethod = element.requestFullScreen || //W3C
-                    element.webkitRequestFullScreen || //Chrome等
-                    element.mozRequestFullScreen || //FireFox
-                    element.msRequestFullScreen; //IE11
-                if (requestMethod) {
-                    requestMethod.call(element);
-                } else if (typeof window.ActiveXObject !== "undefined") { //for Internet Explorer
-                    var wscript = new ActiveXObject("WScript.Shell");
-                    if (wscript !== null) {
-                        wscript.SendKeys("{F11}");
-                    }
-                }
-            }
-
-            var btn = document.getElementsByClassName("footer-box-btn-btn");
-            var btnBox = document.getElementById("obj");
-
-            console.log(btn);
-            // var lineHeight = btnBox.height
-            console.log(btnBox.style.height);
-
-
-            /** state 0 笔顺 1分笔 */
-
-            let state = 1;
-            let current = 0;
-            // let videoEl = document.getElementsByTagName('video')[0];
-            let times = [0];
-
-            function play() {
-                console.log('canplay')
-                videoEl.play();
-
-                draw(this, cont, cont2, cw, ch);
-            }
-
-            function pause() {
-                videoEl.pause()
-                console.log(videoEl.currentTime);
-            }
-
-            function loadVideo() {
-
-                $.ajax('/video.json', {
-                    method: 'get',
-                    success: (rtn) => {
-                        if (rtn.ok) {
-                            times = rtn.data;
-                            state = 1;
-                            current = 0;
-                            // next()
-
-                        } else {
-                            alert('未知的文字')
-
-                        }
-                    }
-                })
-                console.log(videoEl.src);
-            }
-            loadVideo();
-            let timmer;
-
-            function bishun() {
-                state = 0;
-                drawVideo(0);
-                console.log('bishun')
-
-                // videoEl.pause();
-                // videoEl.currentTime = 0;
-                // videoEl.play();
-                disableNext();
-            }
-
-            function fenbi() {
-                videoEl.pause();
-                state = 1;
-                current = 0;
-                videoEl.currentTime = 0;
-                enableNext()
-
-            }
-
-            function next() {
-                videoEl.pause();
-                ++current;
-                // replay();
-
-
-
-            }
-            videoEl.onpause = function() {
-                console.log(videoEl.currentTime);
-            }
-            let interval
-
-            function replay() {
-                console.log('replay');
-                draw()
-                    // if (interval) clearInterval(interval);
-                    // if (state == 0) {
-                    //     bishun();
-                    // } else {
-                    //     if (timmer) {
-                    //         clearTimeout(timmer);
-                    //     }
-                    //     videoEl.pause();
-
-                //     let startTime = times[current - 2] ? times[current - 2] : 0;
-                //     let timeout = times[current - 1] - startTime;
-                //     let endtime = times[current - 1];
-
-                //     if (current > times.length - 1) {
-                //         disableNext();
-                //     }
-                //     videoEl.currentTime = startTime / 1000;
-                //     // videoEl.cur
-                //     videoEl.play();
-                //     console.log(`第${current}笔`, '播放起点:', startTime, '播放时间:', timeout, videoEl.currentTime);
-
-                //     // timmer = setTimeout(() => {
-                //     //     videoEl.pause();
-                //     // }, timeout);
-                //     console.log('pause', videoEl.currentTime * 1000, endtime)
-                //     interval = setInterval(() => {
-                //         if (videoEl.currentTime * 1000 > endtime) {
-
-                //             videoEl.pause();
-                //             clearInterval(interval);
-                //         }
-                //     }, 10);
-
-
-                // }
-            }
-
-            function disableNext() {
-                $('#next').attr('disabled', 'disabled').attr('onclick', false);
-
-            }
-
-            function enableNext() {
-                $('#next').attr('disabled', false);
-                $('#next').attr('onclick', 'next()');
-
-            }
-
-            function drawVideo(startime, endtime) {
-                videoEl.pause();
-                videoEl.currentTime = startime;
-                // videoEl
-                console.log('draw video')
-                draw(videoEl, cont, cont2, cw, ch);
-
-            }
-
-
-
-
-
-
-
-            function draw(v, c, c2, w, h) {
-                v.play();
-                if (v.paused || v.ended) {
-                    console.log('pause can]t play video ')
-                    cancelAnimationFrame(stop);
-                    return false;
-
-                    // interval = setInterval()
-                    c2.drawImage(v, 0, 0, w, h);
-                    var idata = c2.getImageData(0, 0, w, h),
-                        data = idata.data;
-                    // for (var i = 0; i < data.length; i += 4) {
-                    //     var r = data[i],
-                    //         g = data[i + 1],
-                    //         b = data[i + 2];
-                    //     brightness = (3 * r + 4 * g + b) >>> 3;
-                    //     data[i] = brightness;
-                    //     data[i + 1] = brightness;
-                    //     data[i + 2] = brightness;
-                    // };
-                    idata.data = data;
-                    console.log(idata)
-                    c.putImageData(idata, 0, 0);
-                    var stop = requestAnimationFrame(function() {
-                        draw(v, c, c2, w, h);
-                    });
-
-
-                }
-            }
-        } catch (e) {
-            if (e) alert(e)
-        }
-    </script>
 </body>
 
 </html>
